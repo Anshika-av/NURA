@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Link } from "react-router-dom";
 import botanicalArtwork from "./assets/art1.png";
 
 
@@ -102,12 +103,12 @@ function LandingPage() {
           <a href="#about" className="transition hover:text-[#C84F6B]">About Nura</a>
         </div>
 
-        <a
-          href="#get-started"
+        <Link
+          to="/dashboard"
           className="rounded-full bg-[#C94F6C] px-6 py-3 text-sm font-medium text-white shadow-md shadow-[#C94F6C]/15 transition hover:bg-[#AA3D59]"
         >
           Get Started <span className="ml-2">→</span>
-        </a>
+        </Link>
       </nav>
 
       {/* Hero */}
@@ -135,12 +136,12 @@ function LandingPage() {
           </p>
 
           <div className="mt-9 flex flex-wrap items-center gap-5">
-            <a
-              href="#get-started"
+            <Link
+              to="/dashboard"
               className="rounded-full bg-[#C94F6C] px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-[#C94F6C]/20 transition hover:-translate-y-0.5 hover:bg-[#AA3D59]"
             >
               Start Tracking Free <span className="ml-2">→</span>
-            </a>
+            </Link>
             <a
               href="#features"
               className="text-sm font-medium text-[#895B60] transition hover:text-[#C94F6C]"
@@ -284,12 +285,12 @@ function LandingPage() {
         <p className="mx-auto mt-5 max-w-xl leading-7 text-[#806B68]">
           A more personal way to track, learn, and care for your well-being.
         </p>
-        <a
-          href="#"
+        <Link
+          to="/dashboard"
           className="mt-8 inline-block rounded-full bg-[#C94F6C] px-9 py-4 text-sm font-semibold text-white shadow-lg shadow-[#C94F6C]/20 transition hover:bg-[#AA3D59]"
         >
           Get Started with Nura →
-        </a>
+        </Link>
       </section>
 
       {/* Footer */}
@@ -302,7 +303,7 @@ function LandingPage() {
           <div className="flex gap-6 text-xs text-[#896D6B]">
             <a href="#about">Privacy</a>
             <a href="#features">Features</a>
-            <a href="#get-started">Get started</a>
+            <Link to="/dashboard">Get started</Link>
           </div>
         </div>
       </footer>
