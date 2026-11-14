@@ -104,7 +104,7 @@ function LandingPage() {
         </div>
 
         <Link
-          to="/dashboard"
+          to="/register"
           className="rounded-full bg-[#C94F6C] px-6 py-3 text-sm font-medium text-white shadow-md shadow-[#C94F6C]/15 transition hover:bg-[#AA3D59]"
         >
           Get Started <span className="ml-2">→</span>
@@ -137,7 +137,7 @@ function LandingPage() {
 
           <div className="mt-9 flex flex-wrap items-center gap-5">
             <Link
-              to="/dashboard"
+              to="/register"
               className="rounded-full bg-[#C94F6C] px-8 py-4 text-sm font-semibold text-white shadow-lg shadow-[#C94F6C]/20 transition hover:-translate-y-0.5 hover:bg-[#AA3D59]"
             >
               Start Tracking Free <span className="ml-2">→</span>
@@ -329,7 +329,7 @@ function LandingPage() {
           A more personal way to track, learn, and care for your well-being.
         </p>
         <Link
-          to="/dashboard"
+          to="/register"
           className="mt-8 inline-block rounded-full bg-[#C94F6C] px-9 py-4 text-sm font-semibold text-white shadow-lg shadow-[#C94F6C]/20 transition hover:bg-[#AA3D59]"
         >
           Get Started with Nura →
@@ -346,7 +346,7 @@ function LandingPage() {
           <div className="flex gap-6 text-xs text-[#896D6B]">
             <a href="#about">Privacy</a>
             <a href="#features">Features</a>
-            <Link to="/dashboard">Get started</Link>
+            <Link to="/register">Get started</Link>
           </div>
         </div>
       </footer>
