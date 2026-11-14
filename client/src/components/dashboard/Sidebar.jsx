@@ -1,5 +1,6 @@
 import { useId } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 function NuraLogo({ size = 34 }) {
   const id = useId().replace(/:/g, "");
@@ -72,6 +73,24 @@ function NuraLogo({ size = 34 }) {
 }
 
 export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  const userName = user?.name || "Elena Rostova";
+  const userInitials =
+    userName
+      .split(" ")
+      .filter(Boolean)
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase() || "ER";
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   const navigation = [
     {
       id: "overview",
@@ -210,7 +229,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
         </div>
 
         {/* Bottom Profile and Landing Page return */}
-        <div className="space-y-3 pt-6 border-t border-[#F0DDD5]">
+        <div className="space-y-2.5 pt-5 border-t border-[#F0DDD5]">
           <Link
             to="/"
             className="flex items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#806B68] transition hover:bg-[#F7EDE8] hover:text-[#542B35]"
@@ -221,17 +240,28 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
             <span>Return to Landing Page</span>
           </Link>
 
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-medium text-[#806B68] transition hover:bg-[#FCE4E4] hover:text-[#C94F6C]"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Log Out</span>
+          </button>
+
           <div className="flex items-center gap-3 rounded-2xl bg-white/80 border border-[#F0DDD5] p-3 shadow-xs">
             <div className="relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#E77D91] to-[#A83D55] text-sm font-semibold text-white shadow-xs">
-              ER
+              {userInitials}
               <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500" />
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-xs font-semibold text-[#542B35]">
-                Elena Rostova
+                {userName}
               </p>
               <p className="truncate text-[11px] text-[#A18480]">
-                Cycle Day 14 • Bloom
+                {user?.email || "Cycle Day 14 • Bloom"}
               </p>
             </div>
           </div>

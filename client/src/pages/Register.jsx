@@ -1,6 +1,6 @@
 import { useState, useId } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { authApi, setStoredToken } from "../api";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.jsx";
 
 function NuraLogo({ size = 44 }) {
   const id = useId().replace(/:/g, "");
@@ -74,6 +74,8 @@ function NuraLogo({ size = 44 }) {
 
 export default function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { register } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -115,27 +117,14 @@ export default function Register() {
     setError("");
 
     try {
-      const response = await authApi.register({
+      await register({
         name: trimmedName,
         email: trimmedEmail,
         password,
       });
 
-      if (response?.data?.token) {
-        setStoredToken(response.data.token);
-
-        if (response.data.user) {
-          try {
-            localStorage.setItem("nura_user", JSON.stringify(response.data.user));
-          } catch {
-            // Safe fallback if localStorage is restricted
-          }
-        }
-
-        navigate("/dashboard");
-      } else {
-        throw new Error("Invalid response format from server.");
-      }
+      const destination = location.state?.from?.pathname || "/dashboard";
+      navigate(destination, { replace: true });
     } catch (err) {
       if (err.status === 0) {
         setError("Unable to create your account. Please check your internet connection and try again.");
