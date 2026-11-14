@@ -1,7 +1,16 @@
 const request = require('supertest');
+const { getPrisma } = require('../src/config/db');
 const app = require('../src/app');
 
+jest.mock('../src/config/db', () => ({
+  getPrisma: jest.fn(),
+}));
+
 describe('NURA API Tests', () => {
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
   // Test 1: Health check
   test('GET /api/v1/health should return 200', async () => {
     const response = await request(app)
@@ -10,6 +19,17 @@ describe('NURA API Tests', () => {
     expect(response.statusCode).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.message).toBe('NURA backend is running!');
+  });
+
+  test('GET /api/v1/health/database should query the database', async () => {
+    getPrisma.mockReturnValue({
+      $queryRaw: jest.fn().mockResolvedValue([{ '?column?': 1 }]),
+    });
+
+    const response = await request(app).get('/api/v1/health/database');
+
+    expect(response.statusCode).toBe(200);
+    expect(response.body.success).toBe(true);
   });
 
   // Test 2: API root

@@ -232,11 +232,11 @@ The `(symptom_log_id, symptom_id)` pair is unique.
 
 ## 5. PostgreSQL schema
 
-The Prisma models are in `server/prisma/schema.prisma`. They describe the
-columns, relations, unique constraints, and indexes. PostgreSQL `CHECK`
-constraints are also part of the design below; Prisma schema syntax does not
-express these checks, so they must be included in the SQL migration when
-migrations are created.
+The Prisma models are in `server/prisma/schema.prisma`. The initial migration
+is in `server/prisma/migrations/20261114063826_init/migration.sql`. Prisma
+models describe the columns, relations, unique constraints, and indexes.
+PostgreSQL `CHECK` constraints are also included in the initial SQL migration
+because Prisma schema syntax does not express these checks.
 
 ```sql
 CREATE TABLE users (
@@ -430,3 +430,6 @@ attributes only when supported by a functional requirement.
 This nine-entity design provides a normalized PostgreSQL foundation for Nura.
 Its Prisma models, foreign keys, uniqueness rules, deletion behavior, indexes,
 and database checks should evolve together through reviewed migrations.
+
+Representative SQL operations are collected in
+[`Database-Queries.sql`](./Database-Queries.sql).

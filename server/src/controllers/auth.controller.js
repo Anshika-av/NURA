@@ -1,11 +1,15 @@
-// Handles registration and login requests
+const { generateToken } = require('../utils/jwt.util');
+const authService = require('../services/auth.service');
 
 const register = async (req, res, next) => {
   try {
-    // Registration logic will be added through the auth service.
-    res.status(501).json({
-      success: false,
-      message: 'Registration is not implemented yet',
+    const user = await authService.registerUser(req.body);
+    res.status(201).json({
+      success: true,
+      data: {
+        user,
+        token: generateToken(user.id),
+      },
     });
   } catch (error) {
     next(error);
@@ -14,10 +18,13 @@ const register = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    // Login logic will be added through the auth service.
-    res.status(501).json({
-      success: false,
-      message: 'Login is not implemented yet',
+    const user = await authService.loginUser(req.body.email, req.body.password);
+    res.status(200).json({
+      success: true,
+      data: {
+        user,
+        token: generateToken(user.id),
+      },
     });
   } catch (error) {
     next(error);
