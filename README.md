@@ -28,20 +28,43 @@ preferences, cycles, period and symptom logs, reminders, and health report
 metadata.
 
 - [Database Schema and Design](docs/database/Database-Schema.md)
+- [SQL Query Examples](docs/database/Database-Queries.sql)
 - Prisma models: `server/prisma/schema.prisma`
 
-Set `DATABASE_URL` in `server/.env` before running database commands. Never
-commit `.env` or real database credentials.
+Set both `DATABASE_URL` and `SHADOW_DATABASE_URL` in `server/.env` before
+running local migrations. Never commit `.env` or real database credentials.
 
 ```bash
 cd server
 npm run db:generate
-npm run db:migrate -- --create-only --name init
+npm run db:deploy
+npm run db:seed
 ```
 
-Review the generated migration and add the PostgreSQL `CHECK` constraints
-listed in the schema documentation before applying it with `npm run db:migrate`.
-Prisma models do not express those checks directly.
+For local schema development, use `npm run db:migrate`. Prisma models do not
+express PostgreSQL `CHECK` constraints directly, so include the documented
+checks in each generated migration before applying it.
 
-The database schema is a foundation; application routes and services still need
-to be connected to the generated database client.
+Authentication, profile, cycle, period-log, symptom-log, reminder, and insight
+routes use Prisma and PostgreSQL. Health-report metadata is modeled but report
+file generation is not implemented yet.
+
+## Database-backed API
+
+The API listens on port `5001`. Check database connectivity at
+`GET /api/v1/health/database`. Authentication endpoints are:
+
+- `POST /api/v1/auth/register`
+- `POST /api/v1/auth/login`
+
+Authenticated routes use a bearer token and currently include:
+
+- `GET/PATCH /api/v1/users/me`
+- `GET/POST /api/v1/cycles` and `GET/PUT/DELETE /api/v1/cycles/:id`
+- Cycle-nested period-log routes at `/api/v1/cycles/:cycleId/period-logs`
+- `GET /api/v1/symptoms` and symptom-log routes at `/api/v1/symptoms/logs`
+- `GET/POST /api/v1/reminders` and `GET/PUT/DELETE /api/v1/reminders/:id`
+- `GET /api/v1/insights`
+
+Cycle, symptom-log, and reminder history endpoints support pagination.
+Symptom-log history also supports `from`, `to`, and `symptomId` query filters.

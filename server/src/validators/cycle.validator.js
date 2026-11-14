@@ -1,12 +1,14 @@
 const { z } = require('zod');
 
+const cycleFields = {
+  startDate: z.string().date('Please provide a valid start date'),
+  endDate: z.string().date('Please provide a valid end date').nullable(),
+};
+
 const createCycleSchema = z
   .object({
-    startDate: z.string().date('Please provide a valid start date'),
-    endDate: z
-      .string()
-      .date('Please provide a valid end date')
-      .optional(),
+    startDate: cycleFields.startDate,
+    endDate: cycleFields.endDate.optional(),
   })
   .refine(
     (data) => {
@@ -19,8 +21,18 @@ const createCycleSchema = z
     }
   );
 
+const updateCycleSchema = z
+  .object({
+    startDate: cycleFields.startDate.optional(),
+    endDate: cycleFields.endDate.optional(),
+  })
+  .refine((data) => Object.keys(data).length > 0, {
+    message: 'Provide at least one cycle field to update',
+  });
+
 module.exports = {
   createCycleSchema,
+  updateCycleSchema,
 };
 
 
