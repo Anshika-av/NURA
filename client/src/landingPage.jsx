@@ -93,9 +93,9 @@ function LandingPage() {
     <main className="nura-page min-h-screen overflow-hidden text-[#542B35]">
       {/* Navbar */}
       <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-12 py-6">
-        <a href="#" aria-label="Nura home">
+        <Link to="/" aria-label="Nura home">
           <NuraLogo />
-        </a>
+        </Link>
 
         <div className="hidden items-center gap-10 text-sm text-[#755B5D] md:flex">
           <a href="#features" className="transition hover:text-[#C84F6B]">Features</a>
@@ -191,6 +191,49 @@ function LandingPage() {
             <div key={label} className="flex flex-col items-center gap-2">
               <span className="text-2xl text-[#C75C73]">{icon}</span>
               <span className="text-sm text-[#76595B]">{label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How it works */}
+      <section id="how-it-works" className="mx-auto max-w-[1440px] px-12 py-20">
+        <div className="mx-auto mb-12 max-w-2xl text-center">
+          <span className="text-xs font-semibold uppercase tracking-[.22em] text-[#C16B7B]">
+            How it works
+          </span>
+          <h2 className="mt-5 font-serif text-5xl leading-tight text-[#542B35]">
+            Gentle support,
+            <br />
+            built into your routine.
+          </h2>
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-3">
+          {[
+            {
+              step: "01",
+              title: "Track the basics",
+              description: "Log your cycle, symptoms, and daily mood with a few taps whenever it fits your day.",
+            },
+            {
+              step: "02",
+              title: "Notice patterns",
+              description: "See recurring trends over time so you can understand what feels normal for you.",
+            },
+            {
+              step: "03",
+              title: "Feel more informed",
+              description: "Use your history to build habits that support your energy, rest, and overall well-being.",
+            },
+          ].map(({ step, title, description }) => (
+            <div
+              key={step}
+              className="rounded-3xl border border-[#F0DDD5] bg-white/80 p-8 shadow-sm shadow-[#8D4B5B]/5"
+            >
+              <div className="mb-5 text-sm font-semibold tracking-[.2em] text-[#C16B7B]">{step}</div>
+              <h3 className="mb-3 font-serif text-3xl text-[#542B35]">{title}</h3>
+              <p className="leading-7 text-[#806B68]">{description}</p>
             </div>
           ))}
         </div>
