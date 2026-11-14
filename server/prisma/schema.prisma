@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            BigInt           @id @default(autoincrement())
+  name          String           @db.VarChar(100)
+  email         String           @unique(map: "users_email_key") @db.VarChar(255)
+  passwordHash  String           @map("password_hash") @db.VarChar(255)
+  createdAt     DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  preferences   UserPreferences?
+  cycles        Cycle[]
+  symptomLogs   SymptomLog[]
+  reminders     Reminder[]
+  healthReports HealthReport[]
+
+  @@map("users")
+}
+
+model UserPreferences {
+  id                   BigInt @id @default(autoincrement())
+  userId               BigInt @unique(map: "user_preferences_user_id_key") @map("user_id")
+  cycleLength          Int    @map("cycle_length") @db.SmallInt
+  periodLength         Int    @map("period_length") @db.SmallInt
+  notificationSettings Json   @default("{}") @map("notification_settings") @db.JsonB
+  user                 User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_preferences")
+}
+
+model Cycle {
+  id         BigInt      @id @default(autoincrement())
+  userId     BigInt      @map("user_id")
+  startDate  DateTime    @map("start_date") @db.Date
+  endDate    DateTime?   @map("end_date") @db.Date
+  status     String      @default("active") @db.VarChar(20)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  periodLogs PeriodLog[]
+
+  @@index([userId], map: "idx_cycles_user_id")
+  @@map("cycles")
+}
+
+model PeriodLog {
+  id            BigInt    @id @default(autoincrement())
+  cycleId       BigInt    @map("cycle_id")
+  startDate     DateTime  @map("start_date") @db.Date
+  endDate       DateTime? @map("end_date") @db.Date
+  flowIntensity String    @map("flow_intensity") @db.VarChar(20)
+  cycle         Cycle     @relation(fields: [cycleId], references: [id], onDelete: Cascade)
+
+  @@index([cycleId], map: "idx_period_logs_cycle_id")
+  @@map("period_logs")
+}
+
+model SymptomLog {
+  id     BigInt           @id @default(autoincrement())
+  userId BigInt           @map("user_id")
+  date   DateTime         @db.Date
+  mood   String?          @db.VarChar(50)
+  notes  String?
+  user   User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items  SymptomLogItem[]
+
+  @@index([userId, date], map: "idx_symptom_logs_user_date")
+  @@map("symptom_logs")
+}
+
+model Symptom {
+  id       BigInt           @id @default(autoincrement())
+  name     String           @db.VarChar(100)
+  category String           @db.VarChar(50)
+  logItems SymptomLogItem[]
+
+  @@unique([name, category], map: "uq_symptom_name_category")
+  @@map("symptoms")
+}
+
+model SymptomLogItem {
+  id           BigInt     @id @default(autoincrement())
+  symptomLogId BigInt     @map("symptom_log_id")
+  symptomId    BigInt     @map("symptom_id")
+  severity     String     @db.VarChar(20)
+  symptomLog   SymptomLog @relation(fields: [symptomLogId], references: [id], onDelete: Cascade)
+  symptom      Symptom    @relation(fields: [symptomId], references: [id], onDelete: Restrict)
+
+  @@unique([symptomLogId, symptomId], map: "uq_log_symptom")
+  @@index([symptomId], map: "idx_symptom_items_symptom_id")
+  @@map("symptom_log_items")
+}
+
+model Reminder {
+  id           BigInt   @id @default(autoincrement())
+  userId       BigInt   @map("user_id")
+  reminderType String   @map("reminder_type") @db.VarChar(50)
+  scheduledAt  DateTime @map("scheduled_at") @db.Timestamptz(6)
+  status       String   @default("pending") @db.VarChar(20)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, scheduledAt], map: "idx_reminders_user_scheduled")
+  @@map("reminders")
+}
+
+model HealthReport {
+  id          BigInt   @id @default(autoincrement())
+  userId      BigInt   @map("user_id")
+  reportType  String   @map("report_type") @db.VarChar(50)
+  generatedAt DateTime @default(now()) @map("generated_at") @db.Timestamptz(6)
+  filePath    String   @map("file_path") @db.Text
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId], map: "idx_health_reports_user_id")
+  @@map("health_reports")
+}
