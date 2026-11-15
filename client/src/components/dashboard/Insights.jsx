@@ -1,9 +1,21 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { formatDate, getCycleIntervals } from "../../utils/cycleData.js";
 
-export default function Insights({ view = "all" }) {
-  const [bookmarkedArticles, setBookmarkedArticles] = useState([1, 2]);
+export default function Insights({ view = "all", cycles = [], insights }) {
+  const [bookmarkedArticles, setBookmarkedArticles] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const cycleHistory = useMemo(
+    () => getCycleIntervals(cycles).slice(-6),
+    [cycles]
+  );
+  const frequentSymptoms = insights?.frequentSymptoms ?? [];
+  const maximumOccurrences = Math.max(
+    1,
+    ...frequentSymptoms.map((symptom) => symptom.occurrences)
+  );
+  const averageCycleLength = insights?.cycles?.averageCycleLength;
 
   const toggleBookmark = (id) => {
     if (bookmarkedArticles.includes(id)) {
@@ -12,23 +24,6 @@ export default function Insights({ view = "all" }) {
       setBookmarkedArticles([...bookmarkedArticles, id]);
     }
   };
-
-  const cycleHistory = [
-    { month: "May", days: 28, status: "Regular" },
-    { month: "Jun", days: 29, status: "Regular" },
-    { month: "Jul", days: 28, status: "Regular" },
-    { month: "Aug", days: 27, status: "Regular" },
-    { month: "Sep", days: 28, status: "Regular" },
-    { month: "Oct", days: 28, status: "Regular" },
-  ];
-
-  const symptomFrequency = [
-    { name: "Radiant & High Energy", percentage: 86, color: "bg-[#E77D91]", phase: "Ovulatory" },
-    { name: "Clear Skin & Glow", percentage: 78, color: "bg-[#EBC9A9]", phase: "Follicular" },
-    { name: "Breast Tenderness", percentage: 32, color: "bg-[#C94F6C]", phase: "Luteal" },
-    { name: "Pelvic Cramping", percentage: 24, color: "bg-[#A83D55]", phase: "Menstrual" },
-    { name: "Sweet Cravings", percentage: 19, color: "bg-[#7E3B4D]", phase: "Late Luteal" },
-  ];
 
   const allArticles = [
     {
@@ -117,174 +112,136 @@ export default function Insights({ view = "all" }) {
       {/* 1. Analytics & Trends Card */}
       {showAnalytics && (
         <div className="rounded-3xl border border-[#F0DDD5] bg-white/95 p-6 shadow-[0_4px_25px_rgba(84,43,53,0.04)] backdrop-blur-sm lg:p-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between border-b border-[#F7EDE8] pb-4 gap-2">
+          <div className="flex flex-col gap-2 border-b border-[#F7EDE8] pb-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <span className="text-xs font-semibold uppercase tracking-wider text-[#A83D55]">
-                {view === "analytics" ? "Detailed Diagnostic View" : "Health Trends"}
+                {view === "analytics" ? "Your recorded data" : "Health trends"}
               </span>
               <h2 className="font-serif text-2xl font-semibold text-[#542B35]">
-                Hormone & Symptom Analytics
+                Cycle & Symptom Insights
               </h2>
               <p className="text-xs text-[#806B68]">
-                Continuous biological modeling based on your past 6 menstrual cycles
+                Summaries calculated from cycle and symptom records saved to your account.
               </p>
-            </div>
-
-            <div className="flex items-center gap-2 rounded-full border border-[#F0DDD5] bg-[#FFF8F3] px-3.5 py-1.5 text-xs text-[#542B35]">
-              <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span className="font-medium">98.5% Cycle Consistency</span>
             </div>
           </div>
 
-          {/* Quick Metrics Banner (if dedicated analytics view) */}
           {view === "analytics" && (
-            <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
               <div className="rounded-2xl border border-[#F0DDD5] bg-[#FFF8F3] p-4 text-center">
-                <span className="text-[11px] text-[#806B68] uppercase font-semibold">Mean Cycle</span>
-                <p className="font-serif text-2xl font-bold text-[#542B35] mt-1">28.0 days</p>
-                <span className="text-[10px] text-emerald-600 font-medium">± 0.5d variance</span>
+                <span className="text-[11px] font-semibold uppercase text-[#806B68]">
+                  Average cycle
+                </span>
+                <p className="mt-1 font-serif text-2xl font-bold text-[#542B35]">
+                  {averageCycleLength == null
+                    ? "—"
+                    : `${Number(averageCycleLength).toFixed(1)} days`}
+                </p>
+                <span className="text-[10px] text-[#806B68]">
+                  {insights?.cycles?.intervalCount ?? 0} recorded interval(s)
+                </span>
               </div>
               <div className="rounded-2xl border border-[#F0DDD5] bg-[#FFF8F3] p-4 text-center">
-                <span className="text-[11px] text-[#806B68] uppercase font-semibold">Estrogen Peak</span>
-                <p className="font-serif text-2xl font-bold text-[#C94F6C] mt-1">Day 13.5</p>
-                <span className="text-[10px] text-[#806B68]">Pre-ovulatory surge</span>
+                <span className="text-[11px] font-semibold uppercase text-[#806B68]">
+                  Cycle records
+                </span>
+                <p className="mt-1 font-serif text-2xl font-bold text-[#542B35]">
+                  {cycles.length}
+                </p>
+                <span className="text-[10px] text-[#806B68]">
+                  Saved to your account
+                </span>
               </div>
               <div className="rounded-2xl border border-[#F0DDD5] bg-[#FFF8F3] p-4 text-center">
-                <span className="text-[11px] text-[#806B68] uppercase font-semibold">Progesterone</span>
-                <p className="font-serif text-2xl font-bold text-[#542B35] mt-1">Day 21</p>
-                <span className="text-[10px] text-[#806B68]">Luteal plateau</span>
-              </div>
-              <div className="rounded-2xl border border-[#F0DDD5] bg-[#FFF8F3] p-4 text-center">
-                <span className="text-[11px] text-[#806B68] uppercase font-semibold">Fertile Window</span>
-                <p className="font-serif text-2xl font-bold text-[#A83D55] mt-1">6 days</p>
-                <span className="text-[10px] text-[#806B68]">Days 11–16</span>
+                <span className="text-[11px] font-semibold uppercase text-[#806B68]">
+                  Frequent symptoms
+                </span>
+                <p className="mt-1 font-serif text-2xl font-bold text-[#542B35]">
+                  {frequentSymptoms.length}
+                </p>
+                <span className="text-[10px] text-[#806B68]">
+                  With recorded occurrences
+                </span>
               </div>
             </div>
           )}
 
           <div className="mt-8 grid grid-cols-1 gap-8 lg:grid-cols-12">
-            {/* Historical Cycle Duration Bar Chart (6 cols) */}
             <div className="lg:col-span-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#947875]">
-                  Cycle Length Stability (Last 6 Months)
+                  Recent cycle intervals
                 </h3>
-                <span className="text-[11px] text-[#A83D55] font-medium">Target: 28d</span>
               </div>
 
-              <div className="flex items-end justify-between gap-2 h-48 rounded-2xl border border-[#F5E1DB] bg-[#FFF8F3]/60 p-4">
-                {cycleHistory.map((item) => (
-                  <div key={item.month} className="flex flex-col items-center flex-1 h-full justify-end">
-                    <span className="text-[11px] font-semibold text-[#542B35] mb-1">
-                      {item.days}d
-                    </span>
+              {cycleHistory.length === 0 ? (
+                <p className="rounded-2xl border border-[#F5E1DB] bg-[#FFF8F3]/60 p-5 text-sm text-[#806B68]">
+                  Log at least two cycle start dates to see your cycle intervals.
+                </p>
+              ) : (
+                <div className="flex h-48 items-end justify-between gap-2 rounded-2xl border border-[#F5E1DB] bg-[#FFF8F3]/60 p-4">
+                  {cycleHistory.map((item) => (
                     <div
-                      className="w-full max-w-[38px] rounded-t-xl bg-gradient-to-t from-[#C94F6C] to-[#E77D91] transition-all hover:opacity-85 shadow-2xs"
-                      style={{ height: `${(item.days / 32) * 100}%` }}
-                    />
-                    <span className="mt-2 text-[11px] font-medium text-[#806B68]">
-                      {item.month}
-                    </span>
-                  </div>
-                ))}
-              </div>
-
-              <p className="text-[11px] text-[#806B68] text-center">
-                Cycle deviation is within optimal medical thresholds (<strong className="text-[#542B35]">± 1.2 days</strong>).
-              </p>
+                      key={item.startDate}
+                      className="flex h-full flex-1 flex-col items-center justify-end"
+                    >
+                      <span className="mb-1 text-[11px] font-semibold text-[#542B35]">
+                        {item.days}d
+                      </span>
+                      <div
+                        className="w-full max-w-[38px] rounded-t-xl bg-gradient-to-t from-[#C94F6C] to-[#E77D91]"
+                        style={{
+                          height: `${Math.min(100, Math.max(12, (item.days / 120) * 100))}%`,
+                        }}
+                      />
+                      <span className="mt-2 text-[11px] font-medium text-[#806B68]">
+                        {formatDate(item.startDate, { month: "short", year: "2-digit" })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Symptom Frequency Breakdown (6 cols) */}
             <div className="lg:col-span-6 space-y-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-xs font-semibold uppercase tracking-wider text-[#947875]">
-                  Sensation & Symptom Frequencies
+                  Most frequently logged symptoms
                 </h3>
-                <span className="text-[11px] text-[#806B68]">Correlated Phase</span>
               </div>
 
               <div className="space-y-3.5 rounded-2xl border border-[#F5E1DB] bg-[#FFF8F3]/60 p-4">
-                {symptomFrequency.map((sym) => (
-                  <div key={sym.name} className="space-y-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-[#542B35]">{sym.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] text-[#A18480] bg-white px-2 py-0.5 rounded-full border border-[#F0DDD5]">
-                          {sym.phase}
+                {frequentSymptoms.length === 0 ? (
+                  <p className="py-2 text-sm text-[#806B68]">
+                    Symptom patterns will appear after you save symptom logs.
+                  </p>
+                ) : (
+                  frequentSymptoms.map((symptom) => (
+                    <div
+                      key={`${symptom.category}:${symptom.name}`}
+                      className="space-y-1"
+                    >
+                      <div className="flex items-center justify-between gap-3 text-xs">
+                        <span className="font-medium text-[#542B35]">
+                          {symptom.name}
                         </span>
-                        <span className="font-semibold text-[#542B35] w-8 text-right">{sym.percentage}%</span>
+                        <span className="shrink-0 font-semibold text-[#542B35]">
+                          {symptom.occurrences}{" "}
+                          {symptom.occurrences === 1 ? "entry" : "entries"}
+                        </span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-[#F0DDD5]">
+                        <div
+                          className="h-full rounded-full bg-[#C94F6C] transition-all"
+                          style={{
+                            width: `${(symptom.occurrences / maximumOccurrences) * 100}%`,
+                          }}
+                        />
                       </div>
                     </div>
-                    <div className="h-2 w-full overflow-hidden rounded-full bg-[#F0DDD5]">
-                      <div
-                        className={`h-full rounded-full ${sym.color} transition-all duration-500`}
-                        style={{ width: `${sym.percentage}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
-            </div>
-          </div>
-
-          {/* Hormone Curve SVG Preview */}
-          <div className="mt-8 rounded-2xl border border-[#F5E1DB] bg-gradient-to-br from-[#FFFDFB] to-[#FFF6F2] p-6">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-[#947875]">
-                  Theoretical 28-Day Hormone Rhythm
-                </p>
-                <p className="text-xs text-[#806B68]">Continuous tracking of Estradiol (E2) and Progesterone (P4)</p>
-              </div>
-              <div className="flex items-center gap-5 text-xs">
-                <span className="flex items-center gap-1.5 text-[#C94F6C] font-semibold">
-                  <span className="h-2.5 w-5 rounded-full bg-[#C94F6C]" />
-                  Estrogen (Surges Pre-Ovulation)
-                </span>
-                <span className="flex items-center gap-1.5 text-[#542B35] font-semibold">
-                  <span className="h-2.5 w-5 rounded-full bg-[#542B35]" />
-                  Progesterone (Dominates Luteal)
-                </span>
-              </div>
-            </div>
-
-            {/* Smooth SVG Hormone Curve */}
-            <div className="h-32 w-full overflow-hidden">
-              <svg viewBox="0 0 500 100" preserveAspectRatio="none" className="w-full h-full">
-                {/* Horizontal reference lines */}
-                <line x1="0" y1="25" x2="500" y2="25" stroke="#F5E1DB" strokeDasharray="3 3" />
-                <line x1="0" y1="50" x2="500" y2="50" stroke="#F5E1DB" strokeDasharray="3 3" />
-                <line x1="0" y1="75" x2="500" y2="75" stroke="#F5E1DB" strokeDasharray="3 3" />
-
-                {/* Day 14 vertical marker */}
-                <line x1="250" y1="0" x2="250" y2="100" stroke="#A83D55" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.7" />
-                <text x="254" y="16" fill="#A83D55" fontSize="10" fontWeight="600">Day 14 (Today • Peak LH)</text>
-
-                {/* Estrogen Curve */}
-                <path
-                  d="M 0,85 Q 120,80 180,60 T 240,15 T 280,65 T 380,45 T 500,90"
-                  fill="none"
-                  stroke="#C94F6C"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-
-                {/* Progesterone Curve */}
-                <path
-                  d="M 0,92 L 230,90 Q 280,85 320,40 T 400,20 T 460,75 L 500,92"
-                  fill="none"
-                  stroke="#542B35"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
-            </div>
-            <div className="flex justify-between text-[11px] font-medium text-[#A18480] pt-2 border-t border-[#F5E1DB] mt-2">
-              <span>Day 1 (Menses)</span>
-              <span>Day 7 (Follicular)</span>
-              <span>Day 14 (Ovulation)</span>
-              <span>Day 21 (Mid-Luteal)</span>
-              <span>Day 28 (Cycle End)</span>
             </div>
           </div>
         </div>

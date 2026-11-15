@@ -72,11 +72,17 @@ function NuraLogo({ size = 34 }) {
   );
 }
 
-export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
+export default function Sidebar({
+  isOpen,
+  onClose,
+  activeTab,
+  setActiveTab,
+  phaseName,
+}) {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
 
-  const userName = user?.name || "Elena Rostova";
+  const userName = user?.name || "Nura User";
   const userInitials =
     userName
       .split(" ")
@@ -121,7 +127,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
     },
     {
       id: "analytics",
-      name: "Hormone Analytics",
+      name: "Cycle Analytics",
       icon: (
         <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -220,10 +226,12 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
               </span>
             </div>
             <p className="mt-1 font-serif text-lg font-medium text-[#542B35]">
-              Ovulation Peak
+              {phaseName ?? "Not estimated"}
             </p>
             <p className="mt-1 text-xs text-[#806B68] leading-relaxed">
-              Energy is at its monthly high. High confidence and natural vitality.
+              {phaseName
+                ? "Estimated from your recorded cycle dates."
+                : "Log a period start to see a cycle estimate."}
             </p>
           </div>
         </div>
@@ -261,7 +269,7 @@ export default function Sidebar({ isOpen, onClose, activeTab, setActiveTab }) {
                 {userName}
               </p>
               <p className="truncate text-[11px] text-[#A18480]">
-                {user?.email || "Cycle Day 14 • Bloom"}
+                {user?.email || "Your Nura account"}
               </p>
             </div>
           </div>
