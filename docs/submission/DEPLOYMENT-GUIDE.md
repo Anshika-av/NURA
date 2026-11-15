@@ -18,7 +18,7 @@ The intended hosted topology is the Vite frontend on Vercel, the Express API on 
 1. Create a Neon Free project and database. Neon's Free plan is currently listed at $0/month, with 1 GB storage and 100 CU-hours per project; compute scales to zero after inactivity. Check current limits before deployment.
 2. Create a Render Blueprint from the repository using `render.yaml`. The API is explicitly set to Render's Free plan.
 3. Set the Render API's `DATABASE_URL` to Neon's PostgreSQL connection string, preferably the pooled connection string with TLS enabled. Set `CORS_ORIGINS` and `APP_URL` to the exact Vercel origin.
-4. The API build generates the Prisma client and applies committed migrations; the health check is `/api/v1/health`.
+4. The API build generates the Prisma client, applies committed migrations, and seeds the symptom catalogue; the health check is `/api/v1/health`.
 5. Keep SMTP unset on Render's Free plan. Render blocks outbound traffic on common SMTP ports 25, 465, and 587, so scheduled email delivery will not work there. Never put secrets in `render.yaml`.
 
 Render Free web services spin down after 15 minutes without traffic and can take about a minute to wake. Neon's Free compute also scales to zero after inactivity, so the first request can be slow. Render Free Postgres is intentionally not used because it expires 30 days after creation.
