@@ -25,4 +25,4 @@ The ER model and data dictionary remain in `docs/database/Database-Schema.md`, w
 - The repository includes Vercel, Render, and Docker deployment configuration; no production URL or verified hosted deployment is recorded.
 - Complete the contribution record with team-confirmed responsibilities and evidence; do not infer ownership from commit totals.
 
-Prepared from `main` at commit `c186021`; free-tier deployment edits in the current working tree are not yet committed. Recheck against the final release before submission.
+Prepared from `main` at commit `c186021`; free-tier deployment configuration was added in commit `d6190c4`. Recheck against the final release before submission.
