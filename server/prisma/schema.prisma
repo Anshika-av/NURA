@@ -94,14 +94,20 @@ model SymptomLogItem {
 }
 
 model Reminder {
-  id           BigInt   @id @default(autoincrement())
-  userId       BigInt   @map("user_id")
-  reminderType String   @map("reminder_type") @db.VarChar(50)
-  scheduledAt  DateTime @map("scheduled_at") @db.Timestamptz(6)
-  status       String   @default("pending") @db.VarChar(20)
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                  BigInt    @id @default(autoincrement())
+  userId              BigInt    @map("user_id")
+  reminderType        String    @map("reminder_type") @db.VarChar(50)
+  scheduledAt         DateTime  @map("scheduled_at") @db.Timestamptz(6)
+  status              String    @default("pending") @db.VarChar(20)
+  deliveryStatus      String    @default("queued") @map("delivery_status") @db.VarChar(20)
+  deliveryAttempts    Int       @default(0) @map("delivery_attempts") @db.SmallInt
+  nextAttemptAt       DateTime? @map("next_attempt_at") @db.Timestamptz(6)
+  processingStartedAt DateTime? @map("processing_started_at") @db.Timestamptz(6)
+  lastDeliveryError   String?   @map("last_delivery_error") @db.VarChar(100)
+  user                User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, scheduledAt], map: "idx_reminders_user_scheduled")
+  @@index([status, deliveryStatus, scheduledAt, nextAttemptAt], map: "idx_reminders_delivery_due")
   @@map("reminders")
 }
 

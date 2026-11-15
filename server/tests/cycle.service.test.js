@@ -54,6 +54,13 @@ describe('Cycle persistence', () => {
       startDate: new Date('2026-11-01T00:00:00.000Z'),
       endDate: null,
       status: 'active',
+      periodLogs: [{
+        id: 8n,
+        cycleId: 4n,
+        startDate: new Date('2026-11-01T00:00:00.000Z'),
+        endDate: new Date('2026-11-05T00:00:00.000Z'),
+        flowIntensity: 'medium',
+      }],
     }];
     prisma.$transaction.mockResolvedValue([rows, 1]);
 
@@ -63,6 +70,11 @@ describe('Cycle persistence', () => {
       expect.objectContaining({ where: { userId: 3n } })
     );
     expect(result.cycles[0].id).toBe('4');
+    expect(result.cycles[0].periodLogs[0]).toMatchObject({
+      id: '8',
+      cycleId: '4',
+      flowIntensity: 'medium',
+    });
     expect(result.pagination.total).toBe(1);
   });
 

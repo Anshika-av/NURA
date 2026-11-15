@@ -10,6 +10,13 @@ const serializeCycle = (cycle) => ({
   ...cycle,
   id: cycle.id.toString(),
   userId: cycle.userId.toString(),
+  ...(cycle.periodLogs && {
+    periodLogs: cycle.periodLogs.map((periodLog) => ({
+      ...periodLog,
+      id: periodLog.id.toString(),
+      cycleId: periodLog.cycleId.toString(),
+    })),
+  }),
 });
 
 const listCycles = async (userId, query) => {
@@ -20,6 +27,11 @@ const listCycles = async (userId, query) => {
     prisma.cycle.findMany({
       where: { userId: ownerId },
       orderBy: [{ startDate: 'desc' }, { id: 'desc' }],
+      include: {
+        periodLogs: {
+          orderBy: [{ startDate: 'desc' }, { id: 'desc' }],
+        },
+      },
       skip,
       take: limit,
     }),

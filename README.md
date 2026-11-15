@@ -46,7 +46,8 @@ express PostgreSQL `CHECK` constraints directly, so include the documented
 checks in each generated migration before applying it.
 
 Authentication, profile, cycle, period-log, symptom-log, reminder, and insight
-routes use Prisma and PostgreSQL. Health-report metadata is modeled but report
+routes use Prisma and PostgreSQL. Scheduled reminder emails are sent by the API
+worker when SMTP is configured. Health-report metadata is modeled but report
 file generation is not implemented yet.
 
 ## Database-backed API
@@ -68,3 +69,26 @@ Authenticated routes use a bearer token and currently include:
 
 Cycle, symptom-log, and reminder history endpoints support pagination.
 Symptom-log history also supports `from`, `to`, and `symptomId` query filters.
+
+### Scheduled reminder emails
+
+The server polls due reminders every minute and sends a privacy-preserving email
+without including the reminder type. Configure `SMTP_HOST` and `SMTP_FROM` in
+`server/.env`. Use port `587` with `SMTP_SECURE=false` (the default), or port
+`465` with `SMTP_SECURE=true`. Authenticated SMTP requires TLS. Authentication
+is optional, but `SMTP_USER` and `SMTP_PASSWORD` must be set together. Set
+`APP_URL` to include a link in the message and adjust
+`REMINDER_POLL_INTERVAL_MS` if a different polling interval is needed. Without
+SMTP configuration, the API starts but logs that delivery is disabled and
+keeps reminders queued. Failed sends are retried with exponential backoff up
+to five attempts.
+Reminder responses include a `deliveryStatus` (`queued`, `processing`, `sent`,
+`failed`, or `cancelled`) independently of the reminder's user-facing status.
+
+Apply the reminder delivery migration before starting the updated server:
+
+```bash
+cd server
+npm run db:deploy
+npm run db:generate
+```
