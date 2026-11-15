@@ -1,9 +1,9 @@
 # NURA — Deployment and Configuration Guide
 
-**Status:** Free-tier deployment configuration is prepared for Vercel, Render, and Neon. No hosted deployment has been run or verified.
+**Status:** The free-tier deployment is live at https://nura-rho.vercel.app. Smoke-tested on 2026-11-15: frontend routes, signup/login, API and database health, and the seeded symptom catalogue. Cycle logging, reminders, and other complete workflows still need end-to-end testing.
 
 ## 1. Current status
-The repository includes `client/vercel.json`, `render.yaml`, and `docker-compose.yml`. These are deployment configurations, not evidence that a deployment has completed. Do not state that NURA is deployed until the smoke tests below pass.
+The repository includes `client/vercel.json`, `render.yaml`, and `docker-compose.yml`. The hosted smoke tests confirm the frontend, API, database connection, and account flow are reachable; they do not certify every application workflow.
 
 ## 2. Free hosted topology: Vercel + Render + Neon
 The intended hosted topology is the Vite frontend on Vercel, the Express API on Render's Free plan, and PostgreSQL on Neon's Free plan. The Render Blueprint does not provision a database; the database connection must be added as a secret.
