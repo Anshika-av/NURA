@@ -12,6 +12,7 @@ The intended hosted topology is the Vite frontend on Vercel and the Express API 
 1. Import the repository in Vercel and set the project root directory to `client`.
 2. Use the detected Vite settings (`npm run build`, output directory `dist`); `client/vercel.json` provides SPA fallback for client-side routes.
 3. Set `VITE_API_BASE_URL` in the Vercel project to `https://<your-render-api-host>/api/v1`, then redeploy. This value is public and is embedded at build time.
+
 4. Add the exact Vercel production origin to the Render API's `CORS_ORIGINS` environment variable (comma-separated if multiple origins) and redeploy the API.
 
 ### Render Blueprint
@@ -41,7 +42,7 @@ Open `http://localhost:8080`; the frontend proxies `/api/` to the API. The API h
 | --- | --- | --- |
 | `PORT` | Host-dependent | Port supplied by host; server defaults to 5001 |
 | `JWT_SECRET` | Yes | Long random production-only JWT signing secret |
-| `DATABASE_URL` | Yes | PostgreSQL runtime connection string |
+| `DATABASE_URL` | Yes | PostgreSQL runtime connection string; store in the Render dashboard |
 | `SHADOW_DATABASE_URL` | Dev/migration workflow | Separate Prisma shadow DB; never point to production data |
 | `SMTP_HOST` | Required to enable email | SMTP host |
 | `SMTP_PORT` | Optional | SMTP port; example defaults to 587 |
@@ -68,6 +69,7 @@ The backend reads `CORS_ORIGINS` as a comma-separated exact-origin allowlist, de
 CORS is not authentication or authorization.
 
 ## 7. Database deployment
+
 1. Provision PostgreSQL and a least-privilege application user.
 2. Store production `DATABASE_URL` in the backend host's secret manager.
 3. Back up database before migrations.
@@ -79,7 +81,7 @@ npm run db:generate
 npm run db:deploy
 ```
 5. Verify migration status and database health.
-6. Do not run development migration commands against production. Keep shadow DB credentials separate.
+6. Do not run development migration commands against production. Keep shadow DB credentials separate. Neon's Free plan has limited storage, compute, and history; export data regularly if it must be retained.
 
 ## 8. Backend deployment
 - Install from lockfile with `npm ci`.
