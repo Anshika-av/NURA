@@ -2,8 +2,9 @@
 
 **Project:** NURA — Menstrual Health Tracking and Awareness  
 **Reviewed branch:** `main`  
-**Reviewed commit:** `9b36d08`  
-**Status:** Submission draft. Production deployment and desktop offline implementation remain pending; team contribution and approval details must be completed.
+**Reviewed commit:** `c186021`
+
+**Status:** Submission draft. Free-tier deployment configuration is prepared but not deployed or verified. Desktop offline implementation, team contribution, and approval details remain pending.
 
 ## Document index
 1. [Software Requirements Specification](SRS.md)
@@ -21,7 +22,7 @@ The ER model and data dictionary remain in `docs/database/Database-Schema.md`, w
 - The online React/Vite + Express + PostgreSQL application exists in the repository.
 - The course requires online and offline applications; the team selected desktop for the offline component.
 - Desktop offline storage and synchronization described here are planned, not implemented or tested.
-- No production deployment configuration or production URL was found in the reviewed branch.
+- The repository includes Vercel, Render, and Docker deployment configuration; no production URL or verified hosted deployment is recorded.
 - Complete the contribution record with team-confirmed responsibilities and evidence; do not infer ownership from commit totals.
 
-Prepared from `main` at commit `9b36d08`, including the README, React entry point, API client, Express routes, middleware, validators, Prisma schema, migrations, and environment example. Recheck against the final release before submission.
+Prepared from `main` at commit `c186021`; free-tier deployment edits in the current working tree are not yet committed. Recheck against the final release before submission.

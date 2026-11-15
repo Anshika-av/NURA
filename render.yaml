@@ -2,6 +2,7 @@ services:
   - type: web
     name: nura-api
     runtime: node
+    plan: free
     rootDir: server
     buildCommand: npm ci && npm run db:generate && npm run db:deploy
     startCommand: npm start
@@ -12,30 +13,8 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: DATABASE_URL
-        fromDatabase:
-          name: nura-db
-          property: connectionString
+        sync: false
       - key: CORS_ORIGINS
-        value: https://nura-web.onrender.com
+        sync: false
       - key: APP_URL
-        value: https://nura-web.onrender.com
-
-  - type: web
-    name: nura-web
-    runtime: static
-    rootDir: client
-    buildCommand: npm ci && npm run build
-    staticPublishPath: dist
-    routes:
-      - type: rewrite
-        source: /*
-        destination: /index.html
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://nura-api.onrender.com/api/v1
-
-databases:
-  - name: nura-db
-    databaseName: nura
-    user: nura_app
-    plan: basic-256mb
+        sync: false
