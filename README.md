@@ -3,6 +3,8 @@
 Nura is a menstrual health tracking and awareness application. The repository
 contains a React/Vite client and an Express API.
 
+Deployed Link: https://nura-rho.vercel.app
+
 ## Run locally
 
 Start the backend in one terminal:
