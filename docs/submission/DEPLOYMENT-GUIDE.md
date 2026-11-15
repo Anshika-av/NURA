@@ -1,27 +1,28 @@
 # NURA — Deployment and Configuration Guide
 
-**Status:** The free-tier deployment is live at https://nura-rho.vercel.app. Smoke-tested on 2026-11-15: frontend routes, signup/login, API and database health, and the seeded symptom catalogue. Cycle logging, reminders, and other complete workflows still need end-to-end testing.
+**Status:** Deployment configurations are included for Vercel, Render, and Docker. No hosted deployment has been run or verified.
 
 ## 1. Current status
-The repository includes `client/vercel.json`, `render.yaml`, and `docker-compose.yml`. The hosted smoke tests confirm the frontend, API, database connection, and account flow are reachable; they do not certify every application workflow.
+The repository includes `client/vercel.json`, `render.yaml`, and `docker-compose.yml`. These are deployment configurations, not evidence that a production deployment has completed. Do not state that NURA is deployed until the smoke tests below pass.
 
-## 2. Free hosted topology: Vercel + Render + Neon
-The intended hosted topology is the Vite frontend on Vercel, the Express API on Render's Free plan, and PostgreSQL on Neon's Free plan. The Render Blueprint does not provision a database; the database connection must be added as a secret.
+## 2. Vercel + Render
+The intended hosted topology is the Vite frontend on Vercel and the Express API plus PostgreSQL on Render. Render can also host the frontend through the included Blueprint.
 
 ### Vercel frontend
 1. Import the repository in Vercel and set the project root directory to `client`.
 2. Use the detected Vite settings (`npm run build`, output directory `dist`); `client/vercel.json` provides SPA fallback for client-side routes.
 3. Set `VITE_API_BASE_URL` in the Vercel project to `https://<your-render-api-host>/api/v1`, then redeploy. This value is public and is embedded at build time.
-4. Add the exact Vercel production origin to the Render API's `CORS_ORIGINS` environment variable and `APP_URL`, then redeploy the API.
 
-### Render API and Neon database
-1. Create a Neon Free project and database. Neon's Free plan is currently listed at $0/month, with 1 GB storage and 100 CU-hours per project; compute scales to zero after inactivity. Check current limits before deployment.
-2. Create a Render Blueprint from the repository using `render.yaml`. The API is explicitly set to Render's Free plan.
-3. Set the Render API's `DATABASE_URL` to Neon's PostgreSQL connection string, preferably the pooled connection string with TLS enabled. Set `CORS_ORIGINS` and `APP_URL` to the exact Vercel origin.
-4. The API build generates the Prisma client, applies committed migrations, and seeds the symptom catalogue; the health check is `/api/v1/health`.
-5. Keep SMTP unset on Render's Free plan. Render blocks outbound traffic on common SMTP ports 25, 465, and 587, so scheduled email delivery will not work there. Never put secrets in `render.yaml`.
+4. Add the exact Vercel production origin to the Render API's `CORS_ORIGINS` environment variable (comma-separated if multiple origins) and redeploy the API.
 
-Render Free web services spin down after 15 minutes without traffic and can take about a minute to wake. Neon's Free compute also scales to zero after inactivity, so the first request can be slow. Render Free Postgres is intentionally not used because it expires 30 days after creation.
+### Render Blueprint
+1. Create a Blueprint from the repository using `render.yaml`.
+2. Review Render's plan and current pricing before provisioning. The Blueprint requests a persistent `basic-256mb` PostgreSQL instance; change the plan to one appropriate for expected load and availability.
+3. The API build generates the Prisma client and applies committed migrations; the health check is `/api/v1/health`.
+4. The Blueprint allows the Render static-site origin by default. If using Vercel, include that origin in `CORS_ORIGINS` in the Render dashboard.
+5. Add SMTP credentials in the Render dashboard only if reminder email delivery is required. Never put secrets in `render.yaml`.
+
+The Render Blueprint uses the predictable service URLs `nura-api.onrender.com` and `nura-web.onrender.com`; update the frontend API URL and backend `APP_URL`/`CORS_ORIGINS` if service names or custom domains change.
 
 ## 3. Docker Compose
 Docker runs the frontend, API, and PostgreSQL together. The API waits for PostgreSQL, applies migrations, and then starts. The database is persisted in the `nura-postgres` volume and is not published to the host.
@@ -68,8 +69,9 @@ The backend reads `CORS_ORIGINS` as a comma-separated exact-origin allowlist, de
 CORS is not authentication or authorization.
 
 ## 7. Database deployment
-1. Create a Neon Free PostgreSQL project and database.
-2. Store its TLS-enabled connection string in Render's `DATABASE_URL` secret.
+
+1. Provision PostgreSQL and a least-privilege application user.
+2. Store production `DATABASE_URL` in the backend host's secret manager.
 3. Back up database before migrations.
 4. Run controlled release migration:
 ```bash
